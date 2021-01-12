@@ -96,9 +96,28 @@ def create_metadata_stucture(deconstructed_command, data_block)
     bytes: deconstructed_command[4],
     history_fetched: [],
     history_updated: [],
-    data_block: data_block
+    data_block: data_block,
+    created_at: Time.now.to_i
   }
 end
+
+def delete_expired_data(keys)
+  keys.each do |key|
+    data_from_key = @cached_data[key]
+    data_from_key.each do |data|
+      expired = data[:expiration_date].to_i + data[:created_at] <= Time.now.to_i
+      if expired
+        new_data_from_key = data_from_key.delete(data)
+        @cached_data[key] = new_data_from_key
+      end
+    end
+  end
+
+
+  expired = data[:expiration_date].to_i + data[:created_at] <= Time.now.to_i
+  if expired data.delete()
+end
+
 
 def start
   while true do
@@ -108,6 +127,8 @@ def start
 
       # command_identifier, required_key = deconstructed_command #this syntax assigns the to the variable the value that the array would return if it's position was passed on to it (a,b = c[0],c[1] equals a,b = c)
       command_identifier = deconstructed_command[0]
+
+      delete_expired_data([deconstructed_command[1]].flatten) #????
 
       if READ_COMMANDS.include?(command_identifier)
         required_keys = deconstructed_command[1..(deconstructed_command.length - 1)]
