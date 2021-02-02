@@ -7,11 +7,12 @@ s = TCPSocket.open(hostname, port)
 puts 'connected succesfully'
 command = gets
 s.puts command
-# data_block = gets
-# s.puts data_block
+data_block = gets
+s.puts data_block
 while line = s.gets
   puts line
 end
+s.close
 
 
 
