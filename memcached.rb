@@ -31,25 +31,12 @@ module Memcached
 	end
 
 	def self.process_read_command(command, keys)
-		case command
-			when 'get'
-					get_data(keys)
-			when 'gets'
-					gets_data(keys)
-		end
+		get_data(keys)
 	end
 
 	# data methods
 
 	def self.get_data(keys)
-		response = "ERROR"
-		required_data = @cached_data.filter_map { |current_key, current_value| current_value if keys.include?(current_key) }.flatten
-		#               returns only not null elements                         ruby's inline if                              flatten turns [a,b,[c,d],[e]] into [a,b,c,d,e]
-		response = "END" if required_data
-		return required_data, response
-	end
-
-	def self.gets_data(keys)
 		response = "ERROR"
 		required_data = @cached_data.filter_map { |current_key, current_value| current_value if keys.include?(current_key) }.flatten
 		#               returns only not null elements                         ruby's inline if                              flatten turns [a,b,[c,d],[e]] into [a,b,c,d,e]
@@ -104,7 +91,7 @@ module Memcached
 	end
 
 	def self.cas_data(data)
-		response = "NOT_STORED"
+		response = "NOT_FOUND"
 		data_key = data[:key]
 		cas_key_given = data[:cas_key_given]
 		data_arr = @cached_data[data_key]
@@ -113,11 +100,13 @@ module Memcached
 				# puts "cas key: #{item[:cas_key]}"
 				# puts "given cas: #{cas_key_given}"
 				if item[:cas_key] == cas_key_given
-					puts "index: #{index}"
 					@cached_data[data_key][index] = data
 					@cached_data[data_key][index][:cas_key] = generate_cas_key(item)
 					response = "STORED"
+				else
+					response = "NOT_STORED"
 				end
+
 			end
 		end
 		return response
@@ -134,8 +123,6 @@ module Memcached
 			flags: deconstructed_command[2],
 			expiration_date: deconstructed_command[3],
 			bytes: deconstructed_command[4],
-			# history_fetched: [],
-			# history_updated: [],
 			data_block: data_block[0..prevent_index_from_overflowing - 1],
 			created_at: Time.now.to_i,
 			cas_key: nil,
@@ -187,8 +174,6 @@ module Memcached
 			Thread.start(@server.accept) do |session|
 				command = session.gets
 				deconstructed_command = command.split()
-
-				# command_identifier, required_key = deconstructed_command #this syntax assigns the to the variable the value that the array would return if it's position was passed on to it (a,b = c[0],c[1] equals a,b = c)
 				command_identifier = deconstructed_command[0]
 
 				if READ_COMMANDS.include?(command_identifier)
@@ -214,7 +199,6 @@ module Memcached
 				else
 					session.puts "ERROR\r\n"
 				end
-			# pp @cached_data #this is for pretty printing the data collection
 			end
 		end
 	end
