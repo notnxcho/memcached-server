@@ -97,6 +97,30 @@ Same as clients we have two kinds of commands:
     append
     prepend
     cas
+
+
+***documentation extracted directly from the original memcached repo***
+
+    "set" means "store this data".
+
+    "add" means "store this data, but only if the server *doesn't* already
+    hold data for this key".
+
+    "replace" means "store this data, but only if the server *does*
+    already hold data for this key".
+
+    "append" means "add this data to an existing key after existing data".
+
+    "prepend" means "add this data to an existing key before existing data".
+
+    The append and prepend commands do not accept flags or exptime.
+    They update existing data portions, and ignore new flag and exptime
+    settings.
+
+    "cas" is a check and set operation which means "store this data but
+    only if no one else has updated since I last fetched it."
+
+
     
 We'll begin by stating the structure for the commands to see how they should be written.
 The *write* command structure is the following:
