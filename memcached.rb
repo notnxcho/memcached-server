@@ -2,17 +2,17 @@ require 'socket'
 require 'pp'
 
 module Memcached
+	@server = TCPServer.open(3000)
+
 	#constants
 	READ_COMMANDS = ['get', 'gets']
 	WRITE_COMMANDS = ['set', 'add', 'replace', 'append', 'prepend', 'cas']
 	NO_EXPIRATION_VALUES = ['0']
-
+	
+	#data store
 	@cached_data = {}
-	# @cached_data = {"nacho"=>[{:key=>"nacho", :flags=>"2", :expiration_date=>"3", :bytes=>"4", :history_fetched=>[], :history_updated=>[], :data_block=>"nacbo el bebe\n"}], "valentina"=>[{:key=>"valentina", :flags=>"2", :expiration_date=>"3", :bytes=>"4", :history_fetched=>[], :history_updated=>[], :data_block=>"hola vale\n"}, {:key=>"valentina", :flags=>"2", :expiration_date=>"3", :bytes=>"4", :history_fetched=>[], :history_updated=>[], :data_block=>"vale se appendeo\n"}]
-	@server = TCPServer.open(3000)
 
 	# operational methods
-
 	def self.process_write_command(command, metadata)
 		case command
 		when 'set'
@@ -26,7 +26,7 @@ module Memcached
 		when 'prepend'
 			prepend_data(metadata)
 		when 'cas'
-			cas_data(metadata) # revisar (presentar duda a murtun sobre identificacion del Client/Session)
+			cas_data(metadata)
 		end
 	end
 
@@ -97,8 +97,6 @@ module Memcached
 		data_arr = @cached_data[data_key]
 		if data_arr
 			data_arr.each_with_index do |item, index|
-				# puts "cas key: #{item[:cas_key]}"
-				# puts "given cas: #{cas_key_given}"
 				if item[:cas_key] == cas_key_given
 					@cached_data[data_key][index] = data
 					@cached_data[data_key][index][:cas_key] = generate_cas_key(item)
