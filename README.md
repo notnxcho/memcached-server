@@ -73,11 +73,31 @@ I like to separate clients in two types, the **read** and **write**. This criter
 ***Example clients are provided in the code and they are pretty self-explainatory.***
 
 **Retrieving the server's response**.
-
 From the client, you can retrieve the server's response by performing a **gets**, as showed above.
 This response varies depending on what kind of query did you make.
 
 For example, a read command can throw either an error or a valid response with the information asked.
 A write command will always recieve a status of the operation: "STORED", "NOT_STORED", etc.
 
+
+### Commands
+Now that we have a good general understanding of the communication structure, let's move onto the commands.
+
+Same as clients we have two kinds of commands
+
+**Read**
+
+    get
+    gets
+    
+**Write**
+
+    set
+    add
+    replace
+    append
+    prepend
+    cas
+
+        
 
