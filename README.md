@@ -82,8 +82,7 @@ A write command will always recieve a status of the operation: "STORED", "NOT_ST
 
 ### Commands
 Now that we have a good general understanding of the communication structure, let's move onto the commands.
-
-Same as clients we have two kinds of commands
+Same as clients we have two kinds of commands:
 
 **Read**
 
@@ -98,6 +97,45 @@ Same as clients we have two kinds of commands
     append
     prepend
     cas
+    
+We'll begin by stating the structure for the commands to see how they should be written.
+The *write* command structure is the following:
 
-        
+    prefix key flags expt bytes [cas_given]
+    data_block
+    
+One example could be: 
 
+    add nacho 0 1200 5
+    autos
+    
+But what are all these parameters? we'll break them down one by one:
+
+#### **key**
+The key will be the data identifier
+
+#### **flags**
+Used to classify data accordind to client preferences
+
+#### **expt**
+expt stands for expiration time, and it's the ammount of seconds the data will remain stored before it's deletion
+This parameter should always be a number, and 0 means the data will remain forever stored.
+
+#### **bytes**
+The ammount of information that will be stored in the block, should as well always be a number.
+If the bytes param is greater or equal than the size of the data_block, it'll be stored right away, otherwise, the data_block will be trimmed so it fits the stated size of it.
+
+examples on this:
+
+    add nacho 0 200 5
+    autos
+the data_block stored will be **autos**
+
+    add nacho 0 200 4
+    autos
+the data_block stored will be **auto**
+
+
+#### **cas given**
+This is an optional parameter, only used in the **cas** command, and it's a number as well.
+It's a unique key generated randomly depending in the data creation timestamp and the content of the data_block, used to check if a certain data remained unchanged since the last time a the client fetched it.
