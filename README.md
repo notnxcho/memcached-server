@@ -115,7 +115,7 @@ But what are all these parameters? we'll break them down one by one:
 The key will be the data identifier
 
 #### **flags**
-Used to classify data accordind to client preferences
+Used to classify data according to client preferences
 
 #### **expt**
 expt stands for expiration time, and it's the ammount of seconds the data will remain stored before it's deletion
@@ -138,4 +138,56 @@ the data_block stored will be **auto**
 
 #### **cas given**
 This is an optional parameter, only used in the **cas** command, and it's a number as well.
-It's a unique key generated randomly depending in the data creation timestamp and the content of the data_block, used to check if a certain data remained unchanged since the last time a the client fetched it.
+It's a unique key up to six figures generated randomly depending in the data creation timestamp and the content of the data_block, used to check if a certain data remained unchanged since the last time a the client fetched it.
+
+
+The *read* command structure is the following:
+
+    prefix key [key] [key] ...
+    
+One example could be: 
+
+    get nacho nacho
+This get command will give us the following:
+
+    VALUE 0 5
+    autos
+    VALUE 0 5
+    autos
+    END
+    
+
+## Data structure
+The data is structured in a hash
+
+    @cached_data = {
+        "nacho" => [{
+            key: 'nacho', 
+            flags: '0',
+            expiration_time: 1200,
+            bytes: 40,
+            created_at: 16231328,
+            cas_key: 465378,
+            cas_given: nil,
+            data_block: 'autos'
+        }, 
+        {
+            key: 'nacho', 
+            flags: '0',
+            expiration_time: 1000,
+            bytes: 30,
+            created_at: 16231334,
+            cas_key: 712385,
+            cas_given: nil,
+            data_block: 'motos'
+        }]
+    }
+    
+So it's basically
+
+    cached_data = {
+        key -> array of objects,
+        key -> array of objects,
+        ... and so on
+    }
+    
