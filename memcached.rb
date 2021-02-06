@@ -191,8 +191,6 @@ module Memcached
 
 					metadata = create_metadata_stucture(deconstructed_command, data_block)
 					metadata[:cas_key] = generate_cas_key(metadata)
-					pp metadata
-					puts " "
 					session.puts process_write_command(command_identifier, metadata)
 				else
 					session.puts "ERROR\r\n"

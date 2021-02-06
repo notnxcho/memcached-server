@@ -6,10 +6,7 @@ port = 3000
 s = TCPSocket.open(hostname, port)
 puts 'connected succesfully'
 command = gets
-puts "command: #{command}"
 s.puts command
-# data_block = gets
-# s.puts data_block
 while line = s.gets
   puts line
 end
